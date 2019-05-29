@@ -1,0 +1,173 @@
+定义变量的初值(备用值)
+#!/bin/bash
+read -p "请输入用户名"  u
+useradd $u
+read -p "请输入密码"  p
+echo ${p:-123} | passwd --stdin $u   //当用户没有输入任何密码时使用123
+
+
+${a:}   字符串截取
+${a/}   字符串替换
+${a#}   字符串掐头
+${a%}	字符串去尾
+${a:-}	定义初值
+
+正则表达式,使用一些通用的符号,对文本进行高效查找和筛选,对大部分系统,软件都适用.
+grep "^a" a.txt		//查找以a开头的行
+grep "a$" a.txt		//查找以a结尾的行
+grep "[ab]" a.txt	//查找有字符a或b的行
+grep "[^ab]" a.txt	//查找除了字符a或b的行
+grep "ab." a.txt	//查找有ab与任意单个字符在一起的行
+grep "a*" a.txt		//查找a出现任意次数的行
+grep "a\{2,3\}" a.txt	//查找a出现2次到3次的行
+grep "a\{2\}" a.txt	    //查找a出现2次的行
+grep "a\{2,\}" a.txt	//查找a出现2次以及2次以上的行
+
+扩展正则,使用 egrep 或者  grep -E
+egrep "a{2,3}" a.txt	//查找a出现2次到3次的行
+egrep "a{2}" a.txt	    //查找a出现2次的行
+egrep "a{2,}" a.txt		//查找a出现2次以及2次以上的行
+egrep "a+" a.txt		//查找a出现1次以及1次以上的行,相当于  "a{1,}"
+egrep "abc+" 1.txt		//查找单词abc,其中c可以出现1次以及1次以上
+egrep "a?" a.txt		//查找a出现1次或0次的行
+egrep "abc?" 1.txt		//查找单词abc,其中c可以出现1次或者0次
+egrep "ab|xy" 1.txt		//查找ab或者xy
+
+egrep  "(ab){2}"  1.txt  //查找单词ab出现了2次的行
+egrep  "\bab"  1.txt 	//查找单词ab,前面必须与其他字符隔开或前面没有任何内容
+egrep  "ab\b"  1.txt 	//查找单词ab,后面必须与其他字符隔开或后面没有任何内容
+
+grep  "\w"  1.txt   匹配字母数字下划线  [a-Z0-9_]
+grep  "\s"  1.txt   匹配空格,制表符(tab) 	
+grep -P "\d" 1.txt  匹配数字 相当于 [0-9]     
+
+
+sed  流式编辑器  , 可以查看和编辑文档, 逐行处理
+
+sed文本处理工具的用法：
+
+    用法1：前置命令 | sed  [选项]  '条件指令'
+    用法2：sed  [选项]  '条件指令'  文件.. ..
+
+-n   屏蔽默认输出
+-r   支持扩展正则
+-i	 写入文件
+
+指令:
+p  输出文本内容
+sed  'p'   1.txt   //输出文件所有行,并附加默认输出的行
+sed -n  'p'  1.txt //输出文件所有行,没有默认输出
+sed -n '1p'  1.txt  //只输出文件第1行
+sed -n '2p'  1.txt  //只输出文件第2行
+sed -n '1,3p'  1.txt  //输出文件第1行~第3行
+sed -n '1p;3p'  1.txt  //输出文件第1行和第3行
+sed -n '1,+2p'  1.txt  //输出文件第1行以及后面2行
+sed -n '3,+2p'  1.txt  //输出文件第3行以及后面2行
+sed -n '1~2p'  1.txt   //输出奇数行
+sed -n '2~2p'  1.txt   //输出偶数行
+
+sed -n '/^root/p' 1.txt   //输出以root开头的行
+sed -n '/bash$/p' 1.txt   //输出以bash结尾的行
+sed -n '/o\{2\}/p' 1.txt   //输出有两个连续的o的行
+sed -rn '/o{2}/p' 1.txt    //使用扩展正则,输出有两个连续的o的行
+
+d 删除
+sed  'd'  1.txt   //删除所有行
+sed  '1d' 1.txt   //删除第1行
+sed  '1,+2d' 1.txt   //删除第1行以及后面2行
+sed  '1~2d' 1.txt   //删除奇数行
+sed  '$d' 1.txt   //删除最后一行
+sed  '/^bin/d' 1.txt   //删除bin开头的行
+sed  '/^$/d' 1.txt   //删除空行
+
+s 替换
+s/old/new/
+
+2017 2011 2018
+2017 2017 2024
+2017 2017 2017
+
+sed 's/2017/6666/'   shu.txt   //把所有行的第1个2017替换为6666
+sed 's/2017/6666/g'  shu.txt   //把所有行的所有2017替换为6666
+sed 's/2017/6666/2'  shu.txt   //把所有行的第2个2017替换为6666
+sed '2s/2017/6666/2'  shu.txt  //把第2行的第2个2017替换为6666
+sed '3s/2017/6666/2'  shu.txt  //把第3行的第2个2017替换为6666
+sed '3s/2017/6666/2 ; 3s/2017/6666/2' shu.txt   //把第3行的第2个2017替换为6666, 替换完毕后,第3行还剩余2个2017, 然后再把第2个2017替换为6666,相当于替换了原始状态的第3个2017
+
+/bin/bash 换成   /sbin/sh
+
+sed 's//bin/bash//sbin/sh/'  p   //常规方式替换,冲突报错
+sed 's!/bin/bash!/sbin/sh!'  p   //更换替换符号,改为s!!!
+sed 's(/bin/bash(/sbin/sh('  p    //更换替换符号,改为s(((
+
+删除每行第2个字符,和最后1个字符
+sed 's/.//2 ; s/.$//' n.txt
+
+将每行第1个字符和最后一个1字符替换
+
+使用扩展正则
+sed -r 's/(^.)(.*)(.$)/\3\2\1/'  n.txt
+
+使用基本正则,比较乱,不建议使用
+sed 's/\(^.\)\(.*\)\(.$\)/\3\2\1/'  n.txt
+
+将文本中所有的大写字母添加上大括号
+[root@server0 opt]# sed -r 's/([A-Z])/{\1}/g' n
+
+编写脚本,自动部署ftp服务,并开启上传功能
+
+#!/bin/bash
+yum install -y vsftpd
+cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.old
+sed -i 's/^#anon/anon/'  /etc/vsftpd/vsftpd.conf
+systemctl restart vsftpd
+systemctl enable vsftpd
+chmod 777 /var/ftp/pub
+
+脚本写完后运行, 同时关闭防火墙和selinux ,用真机测试虚拟机的ftp可以匿名上传文件则成功
+systemctl stop  firewalld
+setenforce 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
