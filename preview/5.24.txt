@@ -1,0 +1,167 @@
+varnish  代理+缓存页面
+要是 varnish 有a就直接给客户端
+cdn 内容分发网络 缓存
+
+git  分布式版本控制
+可以创建共享文件  版本库:版本控制的核心
+git仓库:保存所有数据的地方
+工作区: 
+暂存区:存放所有历史版本的目录
+
+1  先建立git目录  
+2 git init /var/git/project --bare 建立一个空仓库  (/var/git下建立仓库,可制定仓库名字)
+3  客户端   clone 克隆到本地   add 添加到暂存区    push 本地修改及提交修改到服务器  
+  git  clone root@192.168.2.100:/var/git/project   (克隆的时候位置在哪就克隆在哪里) 
+   修改文件要进入这个工作区 project
+   
+./git/本地仓库
+     ./git/文件(索引)
+   vim a.txt
+    git add        
+      git commit
+     git push  
+1 首先clone在进入project下创建新的内容        vim a.txt   
+2 再用add添加到暂存区(索引)                git add .
+3 再git commit  -m  "注释" 到本地仓库 (会提示你没有邮箱和用户名) git commit -m "注释" 
+4 再在git push到服务器上(提示之后复制下面,命令以和版本有关)   git push
+5 继续git pull 进行更新服务器的数据
+6 查看日志 git log   commit(版本号信息)
+#############################################################################################
+head 指针操作
+是一个可以在任何分支和版本移动的指针
+
+将数据还原吗到任意版本
+git reflog  查看日志
+git reset --hard  版本号
+
+############################################################################################
+模拟删除
+git rm init.txt  删除文件
+git commit -m "delete init.txt" 提交本地仓库
+git reflog  查看日志
+git reset --hard 版本号  恢复数据
+
+#############################################################################################
+git分支操作
+git branch -v 查看分支
+git branch  分支名  添加分支
+git checkout 分支名 切换分支
+git merge    分支名  合并分支
+要合并哪个分支必须先切换到那个分支
+
+解决版本分支冲突问题
+cat a.txt        有冲突先查看冲突文件
+vim a.txt        留下自己要的内容删除其他多余的内容
+git add .
+git commit -m "resolved"
+
+###########################################################################################
+git 服务器
+ssh 协议服务器
+git init --bare   创建服务器
+git clone root@   克隆
+ssh-keygen -f /root/.ssh/id_rsa -N '' 生成ssh密钥
+ssh-copy-id 192.168.2.100  
+git  clone root@192.168.2.100:/var/git
+git push
+
+##########################################################################################
+git 协议服务器
+yum -y install git-daemon   安装软件包
+git init --bare    创建版本库
+vim /usr/lib/systemd/system/git@.service  修改配置文件
+systemctl start git.socket        
+git clone git://192.168.2.100/basi_git     克隆
+
+#########################################################################################
+http 协议服务器
+yum -y install httpd gitweb  安装http gitweb
+vim +11 /etc/gitweb.conf      +11 打开配置文件的第11行
+如果没有版本库要新建
+systemctl start httpd
+firefox http://192.168.2.100/git/    查看
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
